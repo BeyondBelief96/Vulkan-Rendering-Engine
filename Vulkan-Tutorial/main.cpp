@@ -29,7 +29,7 @@ public:
         Cleanup();
     }
 private:
-    void DrawFrame() const;
+    void DrawFrame();
 
     GLFWwindow* m_window = nullptr;
     VkInstance m_instance = nullptr;
@@ -54,13 +54,21 @@ private:
     std::vector<VkSemaphore> m_imageAvailableSemaphores;
     std::vector<VkSemaphore> m_renderFinishedSemaphores;
     std::vector<VkFence> m_inFlightFences;
+    bool m_framebufferResized = false;
 
     void InitWindow()
     {
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         m_window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan Tutorial", nullptr, nullptr);
+        glfwSetWindowUserPointer(m_window, this);
+        glfwSetFramebufferSizeCallback(m_window, framebufferResizeCallback);
+    }
+
+    static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+        auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
+        app->m_framebufferResized = true;
     }
 
     void InitVulkan()
@@ -80,19 +88,24 @@ private:
         CreateSyncObjects();
     }
 
-    void MainLoop() const
+    void MainLoop()
     {
-	    while(!glfwWindowShouldClose(m_window))
-	    {
+        while (!glfwWindowShouldClose(m_window))
+        {
             glfwPollEvents();
             DrawFrame();
-	    }
+        }
 
         vkDeviceWaitIdle(m_device);
     }
 
     void Cleanup() const
     {
+        CleanupSwapChain();
+        vkDestroyPipeline(m_device, m_graphicsPipeline, nullptr);
+        vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
+        vkDestroyRenderPass(m_device, m_renderPass, nullptr);
+
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(m_device, m_renderFinishedSemaphores[i], nullptr);
             vkDestroySemaphore(m_device, m_imageAvailableSemaphores[i], nullptr);
@@ -100,21 +113,12 @@ private:
         }
 
         vkDestroyCommandPool(m_device, m_commandPool, nullptr);
-        for (const auto framebuffer : m_swapChainFramebuffers) {
-            vkDestroyFramebuffer(m_device, framebuffer, nullptr);
-        }
-        vkDestroyPipeline(m_device, m_graphicsPipeline, nullptr);
-        vkDestroyRenderPass(m_device, m_renderPass, nullptr);
-        vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
+        vkDestroyDevice(m_device, nullptr);
+
         if (enableValidationLayers) {
             ValidationLayer::DestroyDebugUtilsMessengerEXT(m_instance, m_debugMessenger, nullptr);
         }
-        for (const auto imageView : m_swapChainImageViews) {
-            vkDestroyImageView(m_device, imageView, nullptr);
-        }
-
-        vkDestroySwapchainKHR(m_device, m_swapChain, nullptr);
-        vkDestroyDevice(m_device, nullptr);
+        
         vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
         vkDestroyInstance(m_instance, nullptr);
         glfwDestroyWindow(m_window);
@@ -133,7 +137,7 @@ private:
         appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
         appInfo.pEngineName = "No Engine";
         appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_0;
+        appInfo.apiVersion = VK_API_VERSION_1_2;
 
         VkInstanceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -143,7 +147,6 @@ private:
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
         std::vector<VkExtensionProperties> extensions(extensionCount);
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
-
 
         const auto glfwExtensions = GetRequiredExtensions();
         createInfo.enabledExtensionCount = static_cast<uint32_t>(glfwExtensions.size());
@@ -184,24 +187,24 @@ private:
 
     void CreateSurface()
     {
-	    if(glfwCreateWindowSurface(m_instance, m_window, nullptr, &m_surface) != VK_SUCCESS)
-	    {
+        if (glfwCreateWindowSurface(m_instance, m_window, nullptr, &m_surface) != VK_SUCCESS)
+        {
             throw std::runtime_error("Failed to create window surface.");
-	    }
+        }
     }
 
     void PickPhysicalDevice()
     {
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
-        if(deviceCount == 0)
+        if (deviceCount == 0)
         {
             throw std::runtime_error("Failed to find GPUs with Vulkan Support!");
         }
         std::vector<VkPhysicalDevice> devices(deviceCount);
         vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
 
-        for(const auto& device : devices)
+        for (const auto& device : devices)
         {
             if (IsDeviceSuitable(device))
             {
@@ -210,7 +213,7 @@ private:
             }
         }
 
-        if(m_physicalDevice == VK_NULL_HANDLE)
+        if (m_physicalDevice == VK_NULL_HANDLE)
         {
             throw std::runtime_error("Failed to find a suitable GPU!");
         }
@@ -218,10 +221,10 @@ private:
 
     bool IsDeviceSuitable(const VkPhysicalDevice device)
     {
-    	m_indices = Dnq::FindQueueFamilies(device, m_surface);
+        m_indices = Dnq::FindQueueFamilies(device, m_surface);
         const bool extensionsSupported = Dnq::CheckDeviceExtensionSupport(device);
-    	bool swapChainAdequate = false;
-        if(extensionsSupported)
+        bool swapChainAdequate = false;
+        if (extensionsSupported)
         {
             const SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(device, m_surface);
             swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.present_modes.empty();
@@ -261,7 +264,7 @@ private:
             createInfo.enabledLayerCount = 0;
         }
 
-        if(vkCreateDevice(m_physicalDevice, &createInfo, nullptr, &m_device) != VK_SUCCESS)
+        if (vkCreateDevice(m_physicalDevice, &createInfo, nullptr, &m_device) != VK_SUCCESS)
         {
             throw std::runtime_error("Failed to create logical device!");
         }
@@ -322,6 +325,36 @@ private:
 
         m_swapChainImageFormat = surfaceFormat.format;
         m_swapChainExtent = extent;
+    }
+
+
+    void RecreateSwapChain(const VkDevice& device)
+    {
+        int width = 0, height = 0;
+        glfwGetFramebufferSize(m_window, &width, &height);
+        while ((width == 0 || height == 0) && !glfwWindowShouldClose(m_window)) {
+
+        	glfwGetFramebufferSize(m_window, &width, &height);
+        	glfwWaitEvents();
+        }
+        vkDeviceWaitIdle(device);
+        CleanupSwapChain();
+        CreateSwapChain();
+        CreateImageViews();
+        CreateFrameBuffers();
+    }
+
+    void CleanupSwapChain() const
+    {
+        for (const auto framebuffer : m_swapChainFramebuffers) {
+            vkDestroyFramebuffer(m_device, framebuffer, nullptr);
+        }
+
+        for (const auto imageView : m_swapChainImageViews) {
+            vkDestroyImageView(m_device, imageView, nullptr);
+        }
+
+        vkDestroySwapchainKHR(m_device, m_swapChain, nullptr);
     }
 
     void CreateImageViews()
@@ -573,9 +606,9 @@ private:
 
         VkFenceCreateInfo fenceInfo{};
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
         {
 
             if (vkCreateSemaphore(m_device, &semaphoreInfo, nullptr, &m_imageAvailableSemaphores[i]) != VK_SUCCESS ||
@@ -586,7 +619,6 @@ private:
         }
 
     }
-
 
     static std::vector<const char*> GetRequiredExtensions() {
         uint32_t glfwExtensionCount = 0;
@@ -602,12 +634,23 @@ private:
     }
 };
 
-void HelloTriangleApplication::DrawFrame() const
+void HelloTriangleApplication::DrawFrame()
 {
     vkWaitForFences(m_device, 1, &m_inFlightFences[current_frame], VK_TRUE, UINT64_MAX);
-    vkResetFences(m_device, 1, &m_inFlightFences[current_frame]);
     uint32_t imageIndex;
-    vkAcquireNextImageKHR(m_device, m_swapChain, UINT64_MAX, m_imageAvailableSemaphores[current_frame], VK_NULL_HANDLE, &imageIndex);
+    VkResult result = vkAcquireNextImageKHR(m_device, m_swapChain, UINT64_MAX, m_imageAvailableSemaphores[current_frame],
+        VK_NULL_HANDLE, &imageIndex);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        RecreateSwapChain(m_device);
+        return;
+    }
+    if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+	    throw std::runtime_error("failed to acquire swap chain image!");
+    }
+
+    // Only reset the fence if we are submitting work
+    vkResetFences(m_device, 1, &m_inFlightFences[current_frame]);
+
     vkResetCommandBuffer(m_commandBuffers[current_frame], 0);
     RecordCommandBuffer(m_commandBuffers[current_frame], imageIndex, m_renderPass, m_swapChainFramebuffers, m_swapChainExtent,
         m_graphicsPipeline);
@@ -639,8 +682,14 @@ void HelloTriangleApplication::DrawFrame() const
     presentInfo.pSwapchains = swapChains;
     presentInfo.pImageIndices = &imageIndex;
     presentInfo.pResults = nullptr; // Optional
-    vkQueuePresentKHR(m_presentQueue, &presentInfo);
-
+    result = vkQueuePresentKHR(m_presentQueue, &presentInfo);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferResized) {
+        m_framebufferResized = false;
+        RecreateSwapChain(m_device);
+    }
+    else if (result != VK_SUCCESS) {
+        throw std::runtime_error("failed to present swap chain image!");
+    }
     current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
