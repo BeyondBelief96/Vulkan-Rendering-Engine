@@ -1,5 +1,6 @@
 #ifndef VALIDATION_LAYERS_H
 #define VALIDATION_LAYERS_H
+#include <iostream>
 #include <vector>
 
 #ifdef NDEBUG
