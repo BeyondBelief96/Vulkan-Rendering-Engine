@@ -2,8 +2,6 @@
 #ifndef PHYSICAL_DEVICE_H
 #define PHYSICAL_DEVICE_H
 #include <optional>
-#include <set>
-#include <string>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 

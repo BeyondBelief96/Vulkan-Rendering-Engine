@@ -15,39 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\hello_triangle_scene.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\validation_layers.h">
+    <ClInclude Include="validation_layers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\physical_device.h">
+    <ClInclude Include="physical_device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\swap_chain.h">
+    <ClInclude Include="swap_chain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\util.h">
+    <ClInclude Include="util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\shaders.h">
+    <ClInclude Include="shaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\pipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\hello_triangle_scene.h">
+    <ClInclude Include="pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

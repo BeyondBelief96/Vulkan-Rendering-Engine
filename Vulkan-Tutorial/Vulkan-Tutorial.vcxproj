@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\brand\source\repos\Vulkan-Tutorial\Vulkan-Tutorial\headers;C:\VulkanSDK\1.3.275.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.275.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\brand\source\repos\Vulkan-Tutorial\Vulkan-Tutorial\headers;C:\VulkanSDK\1.3.275.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.275.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -135,19 +135,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\hello_triangle_scene.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\application.h" />
-    <ClInclude Include="headers\hello_triangle_scene.h" />
-    <ClInclude Include="headers\physical_device.h" />
-    <ClInclude Include="headers\scene.h" />
-    <ClInclude Include="headers\shaders.h" />
-    <ClInclude Include="headers\pipeline.h" />
-    <ClInclude Include="headers\swap_chain.h" />
-    <ClInclude Include="headers\util.h" />
-    <ClInclude Include="headers\validation_layers.h" />
+    <ClInclude Include="physical_device.h" />
+    <ClInclude Include="shaders.h" />
+    <ClInclude Include="pipeline.h" />
+    <ClInclude Include="swap_chain.h" />
+    <ClInclude Include="util.h" />
+    <ClInclude Include="validation_layers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
