@@ -15,27 +15,39 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan_core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\glfw_core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="validation_layers.h">
+    <ClInclude Include="headers\validation_layers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="physical_device.h">
+    <ClInclude Include="headers\swap_chain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="swap_chain.h">
+    <ClInclude Include="headers\util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util.h">
+    <ClInclude Include="headers\shaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shaders.h">
+    <ClInclude Include="headers\pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pipeline.h">
+    <ClInclude Include="headers\vulkan_core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\glfw_core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\window_core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

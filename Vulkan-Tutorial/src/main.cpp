@@ -6,15 +6,15 @@
 #include <vector>
 #include <set>
 
+#include "glfw_core.h"
+#include "vulkan_core.h"
 #include "validation_layers.h"
-#include "physical_device.h"
 #include "swap_chain.h"
 #include "shaders.h"
 #include "util.h"
 #include "pipeline.h"
 
-const uint32_t WIDTH = 800;
-const uint32_t HEIGHT = 600;
+
 const int MAX_FRAMES_IN_FLIGHT = 2;
 uint32_t current_frame = 0;
 
@@ -23,7 +23,7 @@ class HelloTriangleApplication
 public:
     void Run()
     {
-        InitWindow();
+        m_glfw.Init(800, 600, "Vulkan Tutorial");
         InitVulkan();
         MainLoop();
         Cleanup();
@@ -31,12 +31,8 @@ public:
 private:
     void DrawFrame();
 
-    GLFWwindow* m_window = nullptr;
-    VkInstance m_instance = nullptr;
-    VkSurfaceKHR m_surface = nullptr;
-    VkDebugUtilsMessengerEXT m_debugMessenger = nullptr;
-    VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
-    Dnq::QueueFamilyIndices m_indices;
+    VulkanCore m_core;
+    GLFWCore m_glfw;
     VkDevice m_device = nullptr;
     VkQueue m_graphicsQueue = nullptr;
     VkQueue m_presentQueue = nullptr;
@@ -54,29 +50,11 @@ private:
     std::vector<VkSemaphore> m_imageAvailableSemaphores;
     std::vector<VkSemaphore> m_renderFinishedSemaphores;
     std::vector<VkFence> m_inFlightFences;
-    bool m_framebufferResized = false;
 
-    void InitWindow()
-    {
-        glfwInit();
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        m_window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan Tutorial", nullptr, nullptr);
-        glfwSetWindowUserPointer(m_window, this);
-        glfwSetFramebufferSizeCallback(m_window, framebufferResizeCallback);
-    }
-
-    static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-        auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
-        app->m_framebufferResized = true;
-    }
 
     void InitVulkan()
     {
-        CreateInstance();
-        SetupDebugMessenger();
-        CreateSurface();
-        PickPhysicalDevice();
+        m_core.Init(&m_glfw);
         CreateLogicalDevice();
         CreateSwapChain();
         CreateImageViews();
@@ -90,7 +68,7 @@ private:
 
     void MainLoop()
     {
-        while (!glfwWindowShouldClose(m_window))
+        while (!glfwWindowShouldClose(m_glfw.GetWindow()))
         {
             glfwPollEvents();
             DrawFrame();
@@ -115,127 +93,15 @@ private:
         vkDestroyCommandPool(m_device, m_commandPool, nullptr);
         vkDestroyDevice(m_device, nullptr);
 
-        if (enableValidationLayers) {
-            ValidationLayer::DestroyDebugUtilsMessengerEXT(m_instance, m_debugMessenger, nullptr);
-        }
-        
-        vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
-        vkDestroyInstance(m_instance, nullptr);
-        glfwDestroyWindow(m_window);
-        glfwTerminate();
-    }
-
-    void CreateInstance()
-    {
-        if (enableValidationLayers && !ValidationLayer::CheckValidationLayerSupport()) {
-            throw std::runtime_error("validation layers requested, but not available!");
-        }
-
-        VkApplicationInfo appInfo{};
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = "Hello Triangle";
-        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.pEngineName = "No Engine";
-        appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_2;
-
-        VkInstanceCreateInfo createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        createInfo.pApplicationInfo = &appInfo;
-
-        uint32_t extensionCount = 0;
-        vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-        std::vector<VkExtensionProperties> extensions(extensionCount);
-        vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
-
-        const auto glfwExtensions = GetRequiredExtensions();
-        createInfo.enabledExtensionCount = static_cast<uint32_t>(glfwExtensions.size());
-        createInfo.ppEnabledExtensionNames = glfwExtensions.data();
-
-        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-
-        if (enableValidationLayers)
-        {
-            createInfo.enabledLayerCount = static_cast<uint32_t>(VALIDATION_LAYERS.size());
-            createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
-
-            ValidationLayer::PopulateDebugMessengerCreateInfo(debugCreateInfo);
-            createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
-        }
-        else
-        {
-            createInfo.enabledLayerCount = 0;
-            createInfo.pNext = nullptr;
-        }
-
-        if (vkCreateInstance(&createInfo, nullptr, &m_instance) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create instance!");
-        }
-    }
-
-    void SetupDebugMessenger()
-    {
-        if (!enableValidationLayers) return;
-
-        VkDebugUtilsMessengerCreateInfoEXT createInfo;
-        ValidationLayer::PopulateDebugMessengerCreateInfo(createInfo);
-
-        if (ValidationLayer::CreateDebugUtilsMessengerEXT(m_instance, &createInfo, nullptr, &m_debugMessenger) != VK_SUCCESS) {
-            throw std::runtime_error("failed to set up debug messenger!");
-        }
-    }
-
-    void CreateSurface()
-    {
-        if (glfwCreateWindowSurface(m_instance, m_window, nullptr, &m_surface) != VK_SUCCESS)
-        {
-            throw std::runtime_error("Failed to create window surface.");
-        }
-    }
-
-    void PickPhysicalDevice()
-    {
-        uint32_t deviceCount = 0;
-        vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
-        if (deviceCount == 0)
-        {
-            throw std::runtime_error("Failed to find GPUs with Vulkan Support!");
-        }
-        std::vector<VkPhysicalDevice> devices(deviceCount);
-        vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
-
-        for (const auto& device : devices)
-        {
-            if (IsDeviceSuitable(device))
-            {
-                m_physicalDevice = device;
-                break;
-            }
-        }
-
-        if (m_physicalDevice == VK_NULL_HANDLE)
-        {
-            throw std::runtime_error("Failed to find a suitable GPU!");
-        }
-    }
-
-    bool IsDeviceSuitable(const VkPhysicalDevice device)
-    {
-        m_indices = Dnq::FindQueueFamilies(device, m_surface);
-        const bool extensionsSupported = Dnq::CheckDeviceExtensionSupport(device);
-        bool swapChainAdequate = false;
-        if (extensionsSupported)
-        {
-            const SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(device, m_surface);
-            swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.present_modes.empty();
-        }
-        return m_indices.IsComplete() && extensionsSupported && swapChainAdequate;
+        m_core.Cleanup();
+        m_glfw.Cleanup();
     }
 
     void CreateLogicalDevice()
     {
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-        const std::set<uint32_t> uniqueQueueFamilies = { m_indices.graphicsFamily.value(), m_indices.presentFamily.value() };
+        auto indices = m_core.GetQueueFamilies();
+        const std::set<uint32_t> uniqueQueueFamilies = { indices.graphics_family.value(), indices.present_family.value() };
 
         const float queuePriority = 1.0f;
         for (const uint32_t queueFamily : uniqueQueueFamilies) {
@@ -264,22 +130,24 @@ private:
             createInfo.enabledLayerCount = 0;
         }
 
-        if (vkCreateDevice(m_physicalDevice, &createInfo, nullptr, &m_device) != VK_SUCCESS)
+        if (vkCreateDevice(m_core.GetPhysicalDevice(), &createInfo, nullptr, &m_device) != VK_SUCCESS)
         {
             throw std::runtime_error("Failed to create logical device!");
         }
 
-        vkGetDeviceQueue(m_device, m_indices.graphicsFamily.value(), 0, &m_graphicsQueue);
-        vkGetDeviceQueue(m_device, m_indices.presentFamily.value(), 0, &m_presentQueue);
+        vkGetDeviceQueue(m_device, indices.graphics_family.value(), 0, &m_graphicsQueue);
+        vkGetDeviceQueue(m_device, indices.present_family.value(), 0, &m_presentQueue);
     }
 
     void CreateSwapChain()
     {
-        const SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(m_physicalDevice, m_surface);
+        const VkPhysicalDevice physicalDevice = m_core.GetPhysicalDevice();
+        const VkSurfaceKHR surface = m_core.GetSurface();
+        const SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(physicalDevice, surface);
 
         const VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
         const VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.present_modes);
-        const VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities, m_window);
+        const VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities, m_glfw.GetWindow());
 
         uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
         if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) {
@@ -288,7 +156,7 @@ private:
 
         VkSwapchainCreateInfoKHR createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-        createInfo.surface = m_surface;
+        createInfo.surface = m_core.GetSurface();
         createInfo.minImageCount = imageCount;
         createInfo.imageFormat = surfaceFormat.format;
         createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -296,10 +164,10 @@ private:
         createInfo.imageArrayLayers = 1;
         createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-        const Dnq::QueueFamilyIndices indices = Dnq::FindQueueFamilies(m_physicalDevice, m_surface);
-        const uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+        const QueueFamilyIndices indices = FindQueueFamilies(physicalDevice, surface);
+        const uint32_t queueFamilyIndices[] = { indices.graphics_family.value(), indices.present_family.value() };
 
-        if (indices.graphicsFamily != indices.presentFamily) {
+        if (indices.graphics_family != indices.present_family) {
             createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
             createInfo.queueFamilyIndexCount = 2;
             createInfo.pQueueFamilyIndices = queueFamilyIndices;
@@ -327,14 +195,13 @@ private:
         m_swapChainExtent = extent;
     }
 
-
     void RecreateSwapChain(const VkDevice& device)
     {
         int width = 0, height = 0;
-        glfwGetFramebufferSize(m_window, &width, &height);
-        while ((width == 0 || height == 0) && !glfwWindowShouldClose(m_window)) {
+        glfwGetFramebufferSize(m_glfw.GetWindow(), &width, &height);
+        while ((width == 0 || height == 0) && !glfwWindowShouldClose(m_glfw.GetWindow())) {
 
-        	glfwGetFramebufferSize(m_window, &width, &height);
+        	glfwGetFramebufferSize(m_glfw.GetWindow(), &width, &height);
         	glfwWaitEvents();
         }
         vkDeviceWaitIdle(device);
@@ -574,7 +441,7 @@ private:
         VkCommandPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-        poolInfo.queueFamilyIndex = m_indices.graphicsFamily.value();
+        poolInfo.queueFamilyIndex = m_core.GetQueueFamilies().graphics_family.value();
 
         if (vkCreateCommandPool(m_device, &poolInfo, nullptr, &m_commandPool) != VK_SUCCESS) {
             throw std::runtime_error("failed to create command pool!");
@@ -618,19 +485,6 @@ private:
             }
         }
 
-    }
-
-    static std::vector<const char*> GetRequiredExtensions() {
-        uint32_t glfwExtensionCount = 0;
-        const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-        std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-
-        if (enableValidationLayers) {
-            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-        }
-
-        return extensions;
     }
 };
 
@@ -683,8 +537,8 @@ void HelloTriangleApplication::DrawFrame()
     presentInfo.pImageIndices = &imageIndex;
     presentInfo.pResults = nullptr; // Optional
     result = vkQueuePresentKHR(m_presentQueue, &presentInfo);
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebufferResized) {
-        m_framebufferResized = false;
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_glfw.HasFrameBufferResized()) {
+        m_glfw.SetFrameBufferResized(false);
         RecreateSwapChain(m_device);
     }
     else if (result != VK_SUCCESS) {

@@ -1,5 +1,7 @@
 #ifndef VALIDATION_LAYERS_H
 #define VALIDATION_LAYERS_H
+#include <ostream>
+#include <iostream>
 #include <vector>
 
 #ifdef NDEBUG
@@ -10,7 +12,7 @@ const bool enableValidationLayers = true;
 
 
 static const std::vector<const char*> VALIDATION_LAYERS = {
-    "VK_LAYER_KHRONOS_validation"
+    "VK_LAYER_KHRONOS_validation",
 };
 
 class ValidationLayer
