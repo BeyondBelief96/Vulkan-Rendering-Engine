@@ -79,6 +79,7 @@ public:
     VkPhysicalDevice& GetPhysicalDevice() { return m_physicalDevice; }
     QueueFamilyIndices& GetQueueFamilies() { return m_indices; }
 
+    uint32_t FindBufferMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
 
 private:
 	void CreateInstance();

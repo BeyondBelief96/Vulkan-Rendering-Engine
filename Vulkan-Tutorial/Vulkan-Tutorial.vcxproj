@@ -135,11 +135,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\application.cpp" />
     <ClCompile Include="src\glfw_core.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\vulkan_core.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\application.h" />
     <ClInclude Include="headers\glfw_core.h" />
     <ClInclude Include="headers\shaders.h" />
     <ClInclude Include="headers\pipeline.h" />
