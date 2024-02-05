@@ -1,6 +1,8 @@
 #include <stdexcept>
 
 #include "vulkan_core.h"
+
+#include "application.h"
 #include "glfw_core.h"
 #include "swap_chain.h"
 #include "validation_layers.h"
@@ -36,6 +38,69 @@ uint32_t VulkanCore::FindBufferMemoryType(const uint32_t typeFilter, const VkMem
     }
 
     throw std::runtime_error("Failed to find suitable memory types.");
+}
+
+void VulkanCore::CreateBuffer(const VkDevice& device, const VkDeviceSize size, const VkBufferUsageFlags usageFlags, const VkMemoryPropertyFlags properties,
+                              VkBuffer& buffer, VkDeviceMemory& bufferMemory) const
+{
+    const std::vector<uint32_t> queueFamilyIndices = {m_indices.graphics_family.value(),
+    m_indices.transfer_family.value() };
+    VkBufferCreateInfo bufferInfo{};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = size;
+    bufferInfo.usage = usageFlags;
+    bufferInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
+    bufferInfo.pQueueFamilyIndices = queueFamilyIndices.data();
+    bufferInfo.queueFamilyIndexCount = 2;
+
+    if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create vertex buffer!");
+    }
+
+    VkMemoryRequirements memoryRequirements;
+    vkGetBufferMemoryRequirements(device, buffer, &memoryRequirements);
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memoryRequirements.size;
+    allocInfo.memoryTypeIndex = FindBufferMemoryType(memoryRequirements.memoryTypeBits,
+        properties);
+    if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate vertex buffer memory!");
+    }
+
+    vkBindBufferMemory(device, buffer, bufferMemory, 0);
+}
+
+void VulkanCore::CopyBuffer(const VkDevice& device, const VkDeviceSize size, const VkBuffer srcBuffer,
+    const VkBuffer dstBuffer, const VkCommandPool& commandPool, const VkQueue& commandQueue)
+{
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = commandPool;
+    allocInfo.commandBufferCount = 1;
+
+    VkCommandBuffer commandBuffer;
+    vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+    VkBufferCopy copyRegion{};
+    copyRegion.srcOffset = 0;
+    copyRegion.dstOffset = 0;
+    copyRegion.size = size;
+    vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+    vkEndCommandBuffer(commandBuffer);
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    vkQueueSubmit(commandQueue, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(commandQueue);
+    vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 }
 
 void VulkanCore::CreateInstance()

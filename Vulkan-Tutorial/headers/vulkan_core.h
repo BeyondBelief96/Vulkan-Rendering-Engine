@@ -11,10 +11,12 @@ struct QueueFamilyIndices
 {
 	std::optional<uint32_t> graphics_family;
 	std::optional<uint32_t> present_family;
+    std::optional<uint32_t> transfer_family;
 
 	bool IsComplete() const
 	{
-		return graphics_family.has_value() && present_family.has_value();
+        return graphics_family.has_value() && present_family.has_value() &&
+            transfer_family.has_value();
 	}
 };
 
@@ -38,6 +40,10 @@ static QueueFamilyIndices FindQueueFamilies(const VkPhysicalDevice device, const
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
         {
             indices.graphics_family = i;
+        }
+        if(queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT && !(queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT))
+        {
+            indices.transfer_family = i;
         }
 
         if (indices.IsComplete()) break;
@@ -80,6 +86,12 @@ public:
     QueueFamilyIndices& GetQueueFamilies() { return m_indices; }
 
     uint32_t FindBufferMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
+
+	void CreateBuffer(const VkDevice& device, VkDeviceSize size, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags properties,
+	                  VkBuffer& buffer, VkDeviceMemory& bufferMemory) const;
+
+    static void CopyBuffer(const VkDevice& device, const VkDeviceSize size, VkBuffer srcBuffer, VkBuffer dstBuffer, const VkCommandPool& commandPool,
+        const VkQueue& commandQueue);
 
 private:
 	void CreateInstance();
