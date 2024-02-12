@@ -8,7 +8,6 @@ int main() {
 	try
 	{
 		Application app;
-		app.Run();
     } catch(const std::exception& exception)
     {
         std::cerr << exception.what() << std::endl;
