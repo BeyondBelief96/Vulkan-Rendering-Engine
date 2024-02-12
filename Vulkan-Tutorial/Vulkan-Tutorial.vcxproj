@@ -137,9 +137,11 @@
   <ItemGroup>
     <ClCompile Include="src\application.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\trek_window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\application.h" />
+    <ClInclude Include="headers\trek_window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
