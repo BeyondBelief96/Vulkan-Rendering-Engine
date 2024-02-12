@@ -7,7 +7,7 @@
 int main() {
 	try
 	{
-		Application app;
+		Trek::Application app;
 		app.Run();
     } catch(const std::exception& exception)
     {

@@ -18,7 +18,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\vulkan_core.cpp">
+    <ClCompile Include="src\trek_core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\glfw_core.cpp">
@@ -27,24 +27,36 @@
     <ClCompile Include="src\application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\trek_pipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\trek_swap_chain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\trek_model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\trek_buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\trek_descriptor_set.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\validation_layers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\swap_chain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\util.h">
+    <ClInclude Include="headers\trek_swap_chain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\shaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\pipeline.h">
+    <ClInclude Include="headers\trek_pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\vulkan_core.h">
+    <ClInclude Include="headers\trek_core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\glfw_core.h">
@@ -54,6 +66,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\trek_model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\trek_buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\trek_descriptor_set.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

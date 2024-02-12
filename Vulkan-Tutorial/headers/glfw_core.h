@@ -6,44 +6,50 @@
 #include "validation_layers.h"
 #include "window_core.h"
 
-class GLFWCore : public WindowCore
-
+namespace Trek
 {
-public:
-    GLFWCore() = default;
-    GLFWwindow* GetWindow() const { return m_window; }
-    int GetWindowWidth() const { return m_windowWidth; }
-    int GetWindowHeight() const { return m_windowHeight; }
+    class GLFWCore : public WindowCore
 
-    void Init(int windowWidth, int windowHeight, const char* windowTitle);
-    void Cleanup() const;
-    bool HasFrameBufferResized() const { return m_framebufferResized; } 
-    void SetFrameBufferResized(const bool frameBufferResized) { m_framebufferResized = frameBufferResized; }
-    virtual VkSurfaceKHR CreateVulkanSurface(const VkInstance& instance) const override;
-
-	static std::vector<const char*> GetRequiredGlfwExtensions()
     {
-        uint32_t glfwExtensionCount = 0;
-        const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-        std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-
-        if (enableValidationLayers) {
-            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    public:
+        GLFWCore(const int windowWidth, const int windowHeight, const char* windowTitle);
+        virtual ~GLFWCore() override;
+        GLFWCore(const GLFWCore& core) = delete;
+        GLFWCore& operator=(const GLFWCore&) = delete;
+        GLFWwindow* GetWindow() const { return m_window; }
+        int GetWindowWidth() const { return m_windowWidth; }
+        int GetWindowHeight() const { return m_windowHeight; }
+        VkExtent2D GetExtent() const {
+            return
+            { static_cast<uint32_t>(m_windowWidth),
+                static_cast<uint32_t>(m_windowHeight) };
         }
 
-        return extensions;
-    }
-    static void FramebufferResizeCallback(GLFWwindow* window, int width, int height) {
-	    const auto glfwCore = reinterpret_cast<GLFWCore*>(glfwGetWindowUserPointer(window));
-        glfwCore->m_framebufferResized = true;
-        glfwGetWindowSize(window, &glfwCore->m_windowWidth, &glfwCore->m_windowHeight);
-    }
+        bool HasFrameBufferResized() const { return m_framebufferResized; }
+        void SetFrameBufferResized(const bool frameBufferResized) { m_framebufferResized = frameBufferResized; }
+        virtual VkSurfaceKHR CreateVulkanSurface(const VkInstance& instance) const override;
 
-private:
-    int m_windowWidth;
-    int m_windowHeight;
-    GLFWwindow* m_window;
-    bool m_framebufferResized = false;
-};
+        static std::vector<const char*> GetRequiredGlfwExtensions()
+        {
+            uint32_t glfwExtensionCount = 0;
+            const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+            std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+
+            if (enableValidationLayers) {
+                extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+            }
+
+            return extensions;
+        }
+    private:
+        static void FramebufferResizeCallback(GLFWwindow* window, int width, int height);
+
+        int m_windowWidth;
+        int m_windowHeight;
+        GLFWwindow* m_window;
+        bool m_framebufferResized = false;
+    };
+}
+
 #endif

@@ -2,122 +2,76 @@
 #define APPLICATION_H
 #include <vector>
 #include <vulkan/vulkan_core.h>
-#include <glm/glm.hpp>
-#include <array>
 
 #include "glfw_core.h"
-#include "vulkan_core.h"
+#include "trek_core.h"
+#include "trek_model.h"
+#include "trek_pipeline.h"
+#include "trek_swap_chain.h"
+#include "trek_buffer.h"
+#include "trek_descriptor_set.h"
 
-struct Vertex
+namespace Trek
 {
-    glm::vec2 pos;
-    glm::vec3 color;
+    struct UniformBufferObject
+    {
+        alignas(16) glm::mat4 model;
+        alignas(16) glm::mat4 view;
+        alignas(16) glm::mat4 proj;
+    };
 
-    static VkVertexInputBindingDescription GetBindingDescription() {
-        VkVertexInputBindingDescription bindingDescription{};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(Vertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+    class Application
+    {
+    public:
+        Application();
+        ~Application() = default;
 
-        return bindingDescription;
-    }
+        Application(const Application&) = delete;
+        Application& operator=(const Application&) = delete;
+        void Run();
+    private:
+        void DrawFrame();
 
-    static std::array<VkVertexInputAttributeDescription, 2> GetAttributeDescriptions() {
-        std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(Vertex, pos);
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(Vertex, color);
-        return attributeDescriptions;
-    }
-};
+        void InitVulkan();
 
-const std::vector<Vertex> VERTICES = {
-	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
-};
+        void MainLoop();
 
-const std::vector<uint16_t> INDICES = {
-    0, 1, 2, 2, 3, 0
-};
+        void Cleanup() const;
 
-class Application
-{
-public:
-    void Run();
-private:
-    void DrawFrame();
+        void CreatePipelineLayout();
 
-    void InitVulkan();
+        void CreatePipeline();
 
-    void MainLoop();
+        void RecreateSwapChain();
 
-    void Cleanup() const;
+        void CreateDescriptorSets();
 
-    void CreateLogicalDevice();
+        void CreateCommandBuffers();
 
-    void CreateSwapChain();
+        void RecordCommandBuffer(uint32_t imageIndex) const;
 
-    void RecreateSwapChain(const VkDevice& device);
+        void UpdateUniformBuffers(uint32_t currentImage) const;
 
-    void CleanupSwapChain() const;
+        void LoadModels();
 
-    void CreateImageViews();
+    	std::unique_ptr<TrekModel> CreateCubeModel(const glm::vec3 offset);
 
-    void CreateRenderPass();
+        void FreeCommandBuffers();
 
-    void CreateGraphicsPipeline();
+        GLFWCore m_glfw{800, 600, "Vulkan Tutorial!"};
+        TrekCore m_core{&m_glfw};
+        std::unique_ptr<TrekSwapChain> m_trekSwapChain;
+        std::shared_ptr<TrekModel> m_model;
+        std::vector<std::unique_ptr<TrekBuffer>> m_globalUboBuffers{ TrekSwapChain::MAX_FRAMES_IN_FLIGHT };
+        std::vector<VkCommandBuffer> m_commandBuffers;
+        std::unique_ptr<TrekPipeline> m_trekPipeline;
+        VkPipelineLayout m_pipelineLayout = nullptr;
 
-    void CreateFrameBuffers();
-
-    void CreateCommandPool();
-
-    void CreateVertexBuffer();
-
-    void CreateIndexBuffer();
-
-    void CreateCommandBuffers();
-
-    void CreateSyncObjects();
-
-    void RecordCommandBuffer(uint32_t imageIndex) const;
-
-    VulkanCore m_core;
-    GLFWCore m_glfw;
-    VkDevice m_device = nullptr;
-    VkQueue m_graphicsQueue = nullptr;
-    VkQueue m_presentQueue = nullptr;
-    VkQueue m_transferQueue = nullptr;
-    VkSwapchainKHR m_swapChain = nullptr;
-    std::vector<VkImage> m_swapChainImages;
-    VkFormat m_swapChainImageFormat{};
-    VkExtent2D m_swapChainExtent{};
-    std::vector<VkImageView> m_swapChainImageViews;
-    VkRenderPass m_renderPass = nullptr;
-    VkPipelineLayout m_pipelineLayout = nullptr;
-    VkPipeline m_graphicsPipeline = nullptr;
-    std::vector<VkFramebuffer> m_swapChainFramebuffers;
-    VkCommandPool m_graphicsCommandPool = nullptr;
-    VkCommandPool m_transferCommandPool = nullptr;
-    std::vector<VkCommandBuffer> m_commandBuffers;
-    std::vector<VkSemaphore> m_imageAvailableSemaphores;
-    std::vector<VkSemaphore> m_renderFinishedSemaphores;
-    std::vector<VkFence> m_inFlightFences;
-    VkBuffer m_vertexBuffer = nullptr;
-    VkDeviceMemory m_vertexBufferMemory = nullptr;
-    VkBuffer m_indexBuffer = nullptr;
-    VkDeviceMemory m_indexBufferMemory = nullptr;
-
-
-	int m_max_Frames_In_Flight = 2;
-    uint32_t m_current_Frame = 0;
-};
-
+        std::unique_ptr<TrekDescriptorSetLayout> m_globalSetLayout{};
+        std::unique_ptr<TrekDescriptorPool> m_globalPool{};
+        std::vector<VkDescriptorSet> m_globalDescriptorSets{};
+        
+    };
+}
 
 #endif
