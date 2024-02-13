@@ -7,10 +7,11 @@
 int main() {
 	try
 	{
-		Application app;
+		const Trek::Application app{};
+        app.Run();
     } catch(const std::exception& exception)
     {
-        std::cerr << exception.what() << std::endl;
+        std::cerr << exception.what() << '\n';
         return EXIT_FAILURE;
     }
 

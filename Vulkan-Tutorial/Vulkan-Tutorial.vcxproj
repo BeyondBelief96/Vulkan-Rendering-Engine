@@ -135,12 +135,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="headers\trek_core.h" />
     <ClCompile Include="src\application.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\trek_core.cpp" />
+    <ClCompile Include="src\trek_pipeline.cpp" />
+    <ClCompile Include="src\trek_swapchain.cpp" />
     <ClCompile Include="src\trek_window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\application.h" />
+    <ClInclude Include="headers\trek_pipeline.h" />
+    <ClInclude Include="headers\trek_swapchain.h" />
     <ClInclude Include="headers\trek_window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

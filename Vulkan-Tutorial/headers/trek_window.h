@@ -9,18 +9,26 @@ namespace Trek
 {
 	class TrekWindow
 	{
-
 	public:
-		TrekWindow(int width, int height, const std::string& name);
+		TrekWindow(int width, int height, std::string name);
 		~TrekWindow();
+		TrekWindow(const TrekWindow&) = delete;
+		TrekWindow& operator=(const TrekWindow&) = delete;
+
+		bool shouldClose() const{ return glfwWindowShouldClose(window);}
+		VkExtent2D getExtent() const { return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) }; }
+		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) const;
+		GLFWwindow* getWindow() const { return window; }
+		int getWindowWidth() const { return width; }
+		int getWindowHeight() const { return height; }
 	private:
 
-		void InitWindow();
+		void initWindow();
 
-		const int m_width;
-		const int m_height;
-		GLFWwindow* m_window;
-		std::string m_windowName;
+		int width;
+		int height;
+		GLFWwindow* window;
+		std::string windowName;
 	};
 }
 

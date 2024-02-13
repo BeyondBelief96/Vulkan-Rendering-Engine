@@ -24,12 +24,30 @@
     <ClCompile Include="src\trek_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\trek_pipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="headers\trek_core.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\trek_core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\trek_swapchain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\trek_window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\trek_pipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\trek_swapchain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
