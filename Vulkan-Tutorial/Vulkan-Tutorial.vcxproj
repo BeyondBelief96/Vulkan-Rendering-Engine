@@ -150,6 +150,7 @@
     <ClCompile Include="Aerolite\src\Particle.cpp" />
     <ClCompile Include="Aerolite\src\Shape.cpp" />
     <ClCompile Include="src\application.cpp" />
+    <ClCompile Include="src\gravity_physics_system.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\simple_renderer_system.cpp" />
     <ClCompile Include="src\trek_core.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="src\trek_renderer.cpp" />
     <ClCompile Include="src\trek_swapchain.cpp" />
     <ClCompile Include="src\trek_window.cpp" />
+    <ClCompile Include="src\vec2_field_system.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aerolite\include\AeroAABB2D.h" />
@@ -193,6 +195,7 @@
     <ClInclude Include="headers\trek_renderer.h" />
     <ClInclude Include="headers\trek_swapchain.h" />
     <ClInclude Include="headers\trek_window.h" />
+    <ClInclude Include="headers\vec2_field_system.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

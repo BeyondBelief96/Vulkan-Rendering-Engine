@@ -13,7 +13,7 @@
 namespace Aerolite {
     class AeroWorld2D {
     private:
-        std::vector<std::unique_ptr<Particle2D>> m_particles;
+        std::vector<std::shared_ptr<Particle2D>> m_particles;
         std::vector<std::unique_ptr<Constraint2D>> m_constraints;
         std::vector<std::shared_ptr<AeroBody2D>> m_bodies;
         std::vector<AeroVec2> m_globalForces;
@@ -59,9 +59,9 @@ namespace Aerolite {
         void ShgSetCellWidth(real cellWidth);
         void ShgSetCellHeight(real cellHeight);
 
-        void AddParticle2D(std::unique_ptr<Particle2D> particle);
-        void AddParticle2Ds(std::vector<std::unique_ptr<Particle2D>> particles);
-        std::vector<Particle2D*> GetParticle2Ds() const;
+        std::shared_ptr<Particle2D> CreateParticle2D(real x, real y, real mass);
+        void AddParticle2D(const std::shared_ptr<Particle2D>& particle);
+        std::vector<std::shared_ptr<Particle2D>> GetParticle2Ds() const;
 
         void AddGlobalForce(const AeroVec2& force);
 

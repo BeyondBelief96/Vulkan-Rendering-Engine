@@ -2,10 +2,16 @@
 #define TREK_GAME_OBJECT_H
 #include <memory>
 
+#include "Particle2D.h"
 #include "trek_model.h"
 
 namespace Trek
 {
+	inline glm::vec2 ConvertAeroToGlm(const AeroVec2& v)
+	{
+		return glm::vec2{ v.x, v.y };
+	}
+
 	class TrekGameObject
 	{
 		struct Transform2dComponent
@@ -26,8 +32,8 @@ namespace Trek
 	public:
 		using id_t = unsigned int;
 
-		TrekGameObject(const TrekGameObject&) = delete;
-		TrekGameObject& operator=(TrekGameObject&) = delete;
+		TrekGameObject(const TrekGameObject&) = default;
+		TrekGameObject& operator=(TrekGameObject&) = default;
 		TrekGameObject(TrekGameObject&& obj) = default;
 		TrekGameObject& operator=(TrekGameObject&& obj) = default;
 
@@ -41,9 +47,10 @@ namespace Trek
 		Transform2dComponent transform2d{};
 
 		std::shared_ptr<TrekModel> model{};
+		std::shared_ptr<Particle2D> particle;
 		glm::vec3 color{};
 	private:
-		explicit TrekGameObject(const id_t objId) : id{objId}{}
+		TrekGameObject(const id_t objId) : id{objId}{}
 		id_t id;
 	};
 }

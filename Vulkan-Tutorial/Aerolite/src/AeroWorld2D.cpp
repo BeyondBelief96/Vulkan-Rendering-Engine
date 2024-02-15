@@ -98,18 +98,16 @@ namespace Aerolite {
         m_shg.SetCellHeight(cellHeight);
     }
 
-    void AeroWorld2D::AddParticle2D(std::unique_ptr<Particle2D> particle)
+    std::shared_ptr<Particle2D> AeroWorld2D::CreateParticle2D(real x, real y, real mass)
     {
-        if (particle != nullptr) {
-            m_particles.push_back(std::move(particle)); // Use std::move to transfer ownership
-        }
+        std::shared_ptr<Particle2D> particle = std::make_shared<Particle2D>(x, y, mass);
+        m_particles.push_back(particle);
+        return particle;
     }
 
-    void AeroWorld2D::AddParticle2Ds(std::vector<std::unique_ptr<Particle2D>> particles)
+    void AeroWorld2D::AddParticle2D(const std::shared_ptr<Particle2D>& particle)
     {
-        for (auto& particle : particles) {
-            AddParticle2D(std::move(particle)); // Use std::move to transfer ownership
-        }
+        m_particles.push_back(particle);
     }
 
     void AeroWorld2D::RemoveBody2D(const int index)
@@ -144,14 +142,9 @@ namespace Aerolite {
         return m_bodies;
     }
 
-    std::vector<Particle2D*> AeroWorld2D::GetParticle2Ds() const
+    std::vector<std::shared_ptr<Particle2D>> AeroWorld2D::GetParticle2Ds() const
     {
-        std::vector<Particle2D*> pointers;
-        pointers.reserve(m_particles.size());
-        for (auto& particle : m_particles) {
-            pointers.push_back(particle.get());
-        }
-        return pointers;
+        return m_particles;
     }
 
 	std::vector<Contact2D> AeroWorld2D::GetContacts() const
