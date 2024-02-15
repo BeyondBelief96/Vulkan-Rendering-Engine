@@ -35,7 +35,7 @@ namespace Trek {
 
         // Not copyable or movable
         TrekCore(const TrekCore&) = delete;
-        void operator=(const TrekCore&) = delete;
+        TrekCore operator=(const TrekCore&) = delete;
         TrekCore(TrekCore&&) = delete;
         TrekCore& operator=(TrekCore&&) = delete;
 

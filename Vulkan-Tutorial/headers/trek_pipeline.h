@@ -4,15 +4,16 @@
 #include <vector>
 
 #include "trek_core.h"
+#include "trek_model.h"
 
 
 namespace Trek
 {
 	struct PipelineConfigInfo
 	{
-		VkViewport viewport;
-		VkRect2D scissor;
-		VkPipelineDynamicStateCreateInfo dynamicStateInfo;
+		PipelineConfigInfo(const PipelineConfigInfo&) = delete;
+		PipelineConfigInfo& operator=(PipelineConfigInfo&) = delete;
+		VkPipelineViewportStateCreateInfo viewportInfo;
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
 		VkPipelineRasterizationStateCreateInfo rasterizationInfo;
 		VkPipelineMultisampleStateCreateInfo multisampleInfo;
@@ -22,6 +23,8 @@ namespace Trek
 		VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
 		VkRenderPass renderPass = VK_NULL_HANDLE;
 		uint32_t subpass = 0;
+		std::vector<VkDynamicState> dynamicStateEnables;
+		VkPipelineDynamicStateCreateInfo dynamicStateInfo;
 	};
 
 	class TrekPipeline
@@ -34,8 +37,13 @@ namespace Trek
 			const PipelineConfigInfo& configInfo);
 
 		~TrekPipeline();
+		TrekPipeline(const TrekPipeline&) = delete;
+		TrekPipeline& operator=(TrekPipeline&&) = delete;
+		TrekPipeline(const TrekPipeline&&) = delete;
+		TrekPipeline& operator=(TrekPipeline&) = delete;
 
-		static PipelineConfigInfo defaultPipelineConfigInfo(uint32_t width, uint32_t height);
+		void bind(VkCommandBuffer commandBuffer) const;
+		static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 
 	private:
 		static std::vector<char> readFile(const std::string& filePath);

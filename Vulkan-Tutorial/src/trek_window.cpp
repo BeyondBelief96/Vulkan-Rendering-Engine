@@ -25,11 +25,21 @@ namespace Trek
 		}
 	}
 
+	void TrekWindow::framebufferResizedCallback(GLFWwindow* window, const int width, const int height)
+	{
+		const auto trekWindow = reinterpret_cast<TrekWindow*>(glfwGetWindowUserPointer(window));
+		trekWindow->frameBufferResized = true;
+		trekWindow->width = width;
+		trekWindow->height = height;
+	}
+
 	void TrekWindow::initWindow()
 	{
 		glfwInit();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 		window = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);
+		glfwSetWindowUserPointer(window, this);
+		glfwSetFramebufferSizeCallback(window, framebufferResizedCallback);
 	}
 }

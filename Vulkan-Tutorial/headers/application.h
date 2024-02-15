@@ -1,9 +1,9 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 #include "trek_window.h"
-#include "trek_pipeline.h"
 #include "trek_core.h"
-#include "trek_swapchain.h"
+#include "trek_renderer.h"
+#include "trek_game_object.h"
 
 // std
 #include <memory>
@@ -15,27 +15,28 @@ namespace Trek
 	{
 	public:
 		Application();
-		~Application();
+		~Application() = default;
 		Application(const Application&) = delete;
 		Application& operator=(Application&) = delete;
 		Application(const Application&&) = delete;
 		Application& operator=(Application&&) = delete;
-		void Run() const;
+		void run();
 		static constexpr int WIDTH = 800;
 		static constexpr int HEIGHT = 600;
 	private:
-		void createPipelineLayout();
-		void createPipeline();
-		void createCommandBuffers();
-		void drawFrame();
-
+		void loadGameObjects();
+		static std::vector<TrekModel::Vertex> triangle();
+		static void sierpinski(
+			std::vector<TrekModel::Vertex>& vertices,
+			int depth,
+			glm::vec2 left,
+			glm::vec2 right,
+			glm::vec2 top);
 
 		TrekWindow trekWindow{WIDTH, HEIGHT, "Vulkan Tutorial!"};
 		TrekCore trekDevice{ trekWindow };
-		TrekSwapChain trekSwapChain{ trekDevice, trekWindow.getExtent() };
-		std::unique_ptr<TrekPipeline> trekPipeline;
-		VkPipelineLayout pipelineLayout;
-		std::vector<VkCommandBuffer> commandBuffer;
+		TrekRenderer trekRenderer{ trekWindow, trekDevice };
+		std::vector<TrekGameObject> gameObjects;
 	};
 }
 

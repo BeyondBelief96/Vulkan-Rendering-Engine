@@ -7,8 +7,8 @@
 int main() {
 	try
 	{
-		const Trek::Application app{};
-        app.Run();
+		Trek::Application app{};
+        app.run();
     } catch(const std::exception& exception)
     {
         std::cerr << exception.what() << '\n';

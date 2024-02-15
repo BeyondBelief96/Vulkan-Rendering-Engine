@@ -12,6 +12,23 @@ namespace Trek {
 
     TrekSwapChain::TrekSwapChain(TrekCore& deviceRef, const VkExtent2D windowExtent)
         : device{ deviceRef }, windowExtent{ windowExtent } {
+        init();
+    }
+
+    TrekSwapChain::TrekSwapChain(TrekCore& deviceRef,
+        VkExtent2D windowExtent,
+        const std::shared_ptr<TrekSwapChain>& previous) :
+	device{ deviceRef },
+	windowExtent{ windowExtent },
+    oldSwapchain(previous)
+    {
+        init();
+        oldSwapchain = nullptr;
+    }
+
+
+    void TrekSwapChain::init()
+    {
         createSwapChain();
         createImageViews();
         createRenderPass();
@@ -19,6 +36,7 @@ namespace Trek {
         createFramebuffers();
         createSyncObjects();
     }
+
 
     TrekSwapChain::~TrekSwapChain() {
         for (const auto imageView : swapChainImageViews) {
@@ -119,6 +137,12 @@ namespace Trek {
         return result;
     }
 
+    bool TrekSwapChain::compareSwapFormats(const TrekSwapChain& sc) const
+    {
+	    return sc.swapChainDepthFormat == swapChainDepthFormat &&
+		    sc.swapChainImageFormat == swapChainImageFormat;
+    }
+
     void TrekSwapChain::createSwapChain() {
 	    const SwapChainSupportDetails swapChainSupport = device.getSwapChainSupport();
 
@@ -163,7 +187,7 @@ namespace Trek {
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
 
-        createInfo.oldSwapchain = VK_NULL_HANDLE;
+        createInfo.oldSwapchain = oldSwapchain == nullptr ? VK_NULL_HANDLE : oldSwapchain->swapChain;
 
         if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
             throw std::runtime_error("failed to create swap chain!");
@@ -244,7 +268,8 @@ namespace Trek {
             VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
         dependency.dstSubpass = 0;
         dependency.dstStageMask =
-            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+            VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
         dependency.dstAccessMask =
             VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
@@ -290,7 +315,8 @@ namespace Trek {
 
     void TrekSwapChain::createDepthResources() {
 	    const VkFormat depthFormat = findDepthFormat();
-	    const VkExtent2D swapChainExtent = getSwapChainExtent();
+        swapChainDepthFormat = depthFormat;
+	    const VkExtent2D extent = getSwapChainExtent();
 
         depthImages.resize(imageCount());
         depthImageMemorys.resize(imageCount());
@@ -300,8 +326,8 @@ namespace Trek {
             VkImageCreateInfo imageInfo{};
             imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
             imageInfo.imageType = VK_IMAGE_TYPE_2D;
-            imageInfo.extent.width = swapChainExtent.width;
-            imageInfo.extent.height = swapChainExtent.height;
+            imageInfo.extent.width = extent.width;
+            imageInfo.extent.height = extent.height;
             imageInfo.extent.depth = 1;
             imageInfo.mipLevels = 1;
             imageInfo.arrayLayers = 1;
@@ -363,7 +389,7 @@ namespace Trek {
     VkSurfaceFormatKHR TrekSwapChain::chooseSwapSurfaceFormat(
         const std::vector<VkSurfaceFormatKHR>& availableFormats) {
         for (const auto& availableFormat : availableFormats) {
-            if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
+            if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
                 availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
                 return availableFormat;
             }
@@ -381,12 +407,12 @@ namespace Trek {
             }
         }
 
-        // for (const auto &availablePresentMode : availablePresentModes) {
-        //   if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
-        //     std::cout << "Present mode: Immediate" << std::endl;
-        //     return availablePresentMode;
-        //   }
-        // }
+         /*for (const auto &availablePresentMode : availablePresentModes) {
+           if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
+             std::cout << "Present mode: Immediate" << std::endl;
+             return availablePresentMode;
+           }
+         }*/
 
         std::cout << "Present mode: V-Sync" << std::endl;
         return VK_PRESENT_MODE_FIFO_KHR;

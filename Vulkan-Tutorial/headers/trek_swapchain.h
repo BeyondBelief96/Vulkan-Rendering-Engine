@@ -1,5 +1,6 @@
 #ifndef TREK_SWAP_CHAIN_H
 #define TREK_SWAP_CHAIN_H
+#include <memory>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
@@ -12,10 +13,11 @@ namespace Trek
         static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
         TrekSwapChain(TrekCore& deviceRef, VkExtent2D windowExtent);
+        TrekSwapChain(TrekCore& deviceRef, VkExtent2D windowExtent, const std::shared_ptr<TrekSwapChain>& previous);
         ~TrekSwapChain();
 
         TrekSwapChain(const TrekSwapChain&) = delete;
-        void operator=(const TrekSwapChain&) = delete;
+        TrekSwapChain operator=(const TrekSwapChain&) = delete;
 
         VkFramebuffer getFrameBuffer(const int index) const { return swapChainFramebuffers[index]; }
         VkRenderPass getRenderPass() const { return renderPass; }
@@ -34,8 +36,11 @@ namespace Trek
 
         VkResult acquireNextImage(uint32_t* imageIndex) const;
         VkResult submitCommandBuffers(const VkCommandBuffer* buffers, const uint32_t* imageIndex);
+        bool compareSwapFormats(const TrekSwapChain& sc) const;
 
     private:
+
+        void init();
         void createSwapChain();
         void createImageViews();
         void createDepthResources();
@@ -51,6 +56,7 @@ namespace Trek
         VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const;
 
         VkFormat swapChainImageFormat;
+        VkFormat swapChainDepthFormat;
         VkExtent2D swapChainExtent;
 
         std::vector<VkFramebuffer> swapChainFramebuffers;
@@ -66,6 +72,7 @@ namespace Trek
         VkExtent2D windowExtent;
 
         VkSwapchainKHR swapChain;
+        std::shared_ptr<TrekSwapChain> oldSwapchain;
 
         std::vector<VkSemaphore> imageAvailableSemaphores;
         std::vector<VkSemaphore> renderFinishedSemaphores;

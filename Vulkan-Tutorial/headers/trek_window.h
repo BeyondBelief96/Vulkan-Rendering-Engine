@@ -21,12 +21,16 @@ namespace Trek
 		GLFWwindow* getWindow() const { return window; }
 		int getWindowWidth() const { return width; }
 		int getWindowHeight() const { return height; }
+		bool wasWindowResized() const { return frameBufferResized; }
+		void resetWindowResizedFlag() { frameBufferResized = false; }
 	private:
 
+		static void framebufferResizedCallback(GLFWwindow* window, int width, int height);
 		void initWindow();
 
 		int width;
 		int height;
+		bool frameBufferResized = false;
 		GLFWwindow* window;
 		std::string windowName;
 	};
