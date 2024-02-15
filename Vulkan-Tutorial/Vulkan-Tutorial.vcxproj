@@ -104,8 +104,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\brand\source\repos\Vulkan-Tutorial\Vulkan-Tutorial\headers;C:\VulkanSDK\1.3.275.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Users\brand\source\repos\Vulkan-Tutorial\Vulkan-Tutorial\Aerolite\include;C:\Users\brand\source\repos\Vulkan-Tutorial\Vulkan-Tutorial\headers;C:\VulkanSDK\1.3.275.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -122,8 +122,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\brand\source\repos\Vulkan-Tutorial\Vulkan-Tutorial\headers;C:\VulkanSDK\1.3.275.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Users\brand\source\repos\Vulkan-Tutorial\Vulkan-Tutorial\Aerolite\include;C:\Users\brand\source\repos\Vulkan-Tutorial\Vulkan-Tutorial\headers;C:\VulkanSDK\1.3.275.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,6 +135,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Aerolite\src\AeroBody2D.cpp" />
+    <ClCompile Include="Aerolite\src\AeroBody3D.cpp" />
+    <ClCompile Include="Aerolite\src\AeroBroadPhase.cpp" />
+    <ClCompile Include="Aerolite\src\AeroShg.cpp" />
+    <ClCompile Include="Aerolite\src\AeroVec2.cpp" />
+    <ClCompile Include="Aerolite\src\AeroVec3.cpp" />
+    <ClCompile Include="Aerolite\src\AeroWorld2D.cpp" />
+    <ClCompile Include="Aerolite\src\Collision2D.cpp" />
+    <ClCompile Include="Aerolite\src\Constraint2D.cpp" />
+    <ClCompile Include="Aerolite\src\Contact2D.cpp" />
+    <ClCompile Include="Aerolite\src\Matrix3x3.cpp" />
+    <ClCompile Include="Aerolite\src\Matrix3x4.cpp" />
+    <ClCompile Include="Aerolite\src\Particle.cpp" />
+    <ClCompile Include="Aerolite\src\Shape.cpp" />
     <ClCompile Include="src\application.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\simple_renderer_system.cpp" />
@@ -146,7 +160,30 @@
     <ClCompile Include="src\trek_window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Aerolite\include\AeroAABB2D.h" />
+    <ClInclude Include="Aerolite\include\AeroBody2D.h" />
+    <ClInclude Include="Aerolite\include\AeroBody3D.h" />
+    <ClInclude Include="Aerolite\include\AeroBroadPhase.h" />
+    <ClInclude Include="Aerolite\include\AeroQuat.h" />
+    <ClInclude Include="Aerolite\include\AeroShg.h" />
+    <ClInclude Include="Aerolite\include\AeroVec2.h" />
+    <ClInclude Include="Aerolite\include\AeroVec3.h" />
+    <ClInclude Include="Aerolite\include\AeroWorld2D.h" />
+    <ClInclude Include="Aerolite\include\Collision2D.h" />
+    <ClInclude Include="Aerolite\include\Config.h" />
+    <ClInclude Include="Aerolite\include\Constants.h" />
+    <ClInclude Include="Aerolite\include\Constraint2D.h" />
+    <ClInclude Include="Aerolite\include\Contact2D.h" />
+    <ClInclude Include="Aerolite\include\Matrix3x3.h" />
+    <ClInclude Include="Aerolite\include\Matrix3x4.h" />
+    <ClInclude Include="Aerolite\include\MatrixMxN.h" />
+    <ClInclude Include="Aerolite\include\Particle2D.h" />
+    <ClInclude Include="Aerolite\include\pfgen.h" />
+    <ClInclude Include="Aerolite\include\Precision.h" />
+    <ClInclude Include="Aerolite\include\Shape.h" />
+    <ClInclude Include="Aerolite\include\VecN.h" />
     <ClInclude Include="headers\application.h" />
+    <ClInclude Include="headers\gravity_physics_system.h" />
     <ClInclude Include="headers\simple_render_system.h" />
     <ClInclude Include="headers\trek_buffer.h" />
     <ClInclude Include="headers\trek_core.h" />

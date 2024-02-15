@@ -6,8 +6,40 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
+#include "pfgen.h"
+
 namespace Trek
 {
+	std::vector<TrekModel::Vertex>  Application::triangle()
+	{
+		std::vector<TrekModel::Vertex> vertices{
+	  {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+	  {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+	  {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}} };
+		return vertices;
+	}
+
+	void Application::sierpinski(
+		std::vector<TrekModel::Vertex>& vertices,
+		const int depth,
+		const glm::vec2 left,
+		const glm::vec2 right,
+		const glm::vec2 top) {
+		if (depth <= 0) {
+			vertices.push_back({ top, {1.0, 0.0, 0.0} });
+			vertices.push_back({ right,  {0.0, 1.0, 0.0} });
+			vertices.push_back({ left,  {0.0, 0.0, 1.0} });
+		}
+		else {
+			const auto leftTop = 0.5f * (left + top);
+			const auto rightTop = 0.5f * (right + top);
+			const auto leftRight = 0.5f * (left + right);
+			sierpinski(vertices, depth - 1, left, leftRight, leftTop);
+			sierpinski(vertices, depth - 1, leftRight, right, rightTop);
+			sierpinski(vertices, depth - 1, leftTop, rightTop, top);
+		}
+	}
+
 	Application::Application()
 	{
 		loadGameObjects();
@@ -43,36 +75,6 @@ namespace Trek
 		triangle.transform2d.scale = { 2.f, 0.5f };
 		triangle.transform2d.rotation = .25f * glm::two_pi<float>();
 		gameObjects.push_back(std::move(triangle));
-	}
-
-	std::vector<TrekModel::Vertex>  Application::triangle()
-	{
-		std::vector<TrekModel::Vertex> vertices{
-	  {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-	  {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-	  {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}} };
-		return vertices;
-	}
-
-	void Application::sierpinski(
-		std::vector<TrekModel::Vertex>& vertices,
-		const int depth,
-		const glm::vec2 left,
-		const glm::vec2 right,
-		const glm::vec2 top) {
-		if (depth <= 0) {
-			vertices.push_back({ top, {1.0, 0.0, 0.0} });
-			vertices.push_back({ right,  {0.0, 1.0, 0.0} });
-			vertices.push_back({ left,  {0.0, 0.0, 1.0} });
-		}
-		else {
-			const auto leftTop = 0.5f * (left + top);
-			const auto rightTop = 0.5f * (right + top);
-			const auto leftRight = 0.5f * (left + right);
-			sierpinski(vertices, depth - 1, left, leftRight, leftTop);
-			sierpinski(vertices, depth - 1, leftRight, right, rightTop);
-			sierpinski(vertices, depth - 1, leftTop, rightTop, top);
-		}
 	}
 }
 

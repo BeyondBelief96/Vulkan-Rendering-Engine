@@ -11,6 +11,7 @@ namespace Trek
 {
 	struct PipelineConfigInfo
 	{
+		PipelineConfigInfo() = default;
 		PipelineConfigInfo(const PipelineConfigInfo&) = delete;
 		PipelineConfigInfo& operator=(PipelineConfigInfo&) = delete;
 		VkPipelineViewportStateCreateInfo viewportInfo;

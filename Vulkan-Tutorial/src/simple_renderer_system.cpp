@@ -6,7 +6,6 @@
 #include <glm/gtc/constants.hpp>
 
 // std
-#include <array>
 #include <stdexcept>
 
 

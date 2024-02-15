@@ -6,8 +6,9 @@
 #include "trek_game_object.h"
 
 // std
-#include <memory>
 #include <vector>
+
+#include "AeroWorld2D.h"
 
 namespace Trek
 {
