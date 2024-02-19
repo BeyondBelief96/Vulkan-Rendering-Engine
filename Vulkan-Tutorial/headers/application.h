@@ -4,6 +4,7 @@
 #include "trek_core.h"
 #include "trek_renderer.h"
 #include "trek_game_object.h"
+#include "trek_camera.h"
 
 // std
 #include <memory>
@@ -25,13 +26,6 @@ namespace Trek
 		static constexpr int HEIGHT = 600;
 	private:
 		void loadGameObjects();
-		static std::vector<TrekModel::Vertex> triangle();
-		static void sierpinski(
-			std::vector<TrekModel::Vertex>& vertices,
-			int depth,
-			glm::vec2 left,
-			glm::vec2 right,
-			glm::vec2 top);
 
 		TrekWindow trekWindow{WIDTH, HEIGHT, "Vulkan Tutorial!"};
 		TrekCore trekDevice{ trekWindow };

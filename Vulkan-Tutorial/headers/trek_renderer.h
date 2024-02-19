@@ -23,6 +23,7 @@ namespace Trek
 
 
 		VkRenderPass getSwapChainRenderPass() const { return trekSwapChain->getRenderPass(); }
+		float getAspectRatio() const { return trekSwapChain->extentAspectRatio(); }
 		bool isFrameInProgress() const { return isFrameStarted; }
 		VkCommandBuffer getCurrentCommandBuffer() const
 		{

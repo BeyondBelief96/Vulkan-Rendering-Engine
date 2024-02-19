@@ -3,6 +3,7 @@
 #include "trek_pipeline.h"
 #include "trek_core.h"
 #include "trek_game_object.h"
+#include "trek_camera.h"
 
 // std
 #include <memory>
@@ -20,7 +21,10 @@ namespace Trek
 		SimpleRenderSystem(const SimpleRenderSystem&&) = delete;
 		SimpleRenderSystem& operator=(SimpleRenderSystem&&) = delete;
 
-		void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<TrekGameObject>& gameObjects) const;
+		void renderGameObjects(
+			VkCommandBuffer commandBuffer,
+			std::vector<TrekGameObject>& gameObjects,
+			const TrekCamera& camera) const;
 	private:
 		void createPipelineLayout();
 		void createPipeline(VkRenderPass renderPass);

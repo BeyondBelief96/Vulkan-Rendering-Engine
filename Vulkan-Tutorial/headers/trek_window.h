@@ -3,6 +3,7 @@
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include <vulkan/vulkan.h>
 #include <string>
 
 namespace Trek
@@ -15,7 +16,7 @@ namespace Trek
 		TrekWindow(const TrekWindow&) = delete;
 		TrekWindow& operator=(const TrekWindow&) = delete;
 
-		bool shouldClose() const{ return glfwWindowShouldClose(window);}
+		bool shouldClose() const { return glfwWindowShouldClose(window); }
 		VkExtent2D getExtent() const { return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) }; }
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) const;
 		GLFWwindow* getWindow() const { return window; }
@@ -23,6 +24,7 @@ namespace Trek
 		int getWindowHeight() const { return height; }
 		bool wasWindowResized() const { return frameBufferResized; }
 		void resetWindowResizedFlag() { frameBufferResized = false; }
+		GLFWwindow* getGLFWwindow() const { return window; }
 	private:
 
 		static void framebufferResizedCallback(GLFWwindow* window, int width, int height);

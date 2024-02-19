@@ -14,8 +14,7 @@ namespace Trek
 {
 	struct SimplePushConstantData
 	{
-		glm::mat2 transform{};
-		glm::vec2 offset;
+		glm::mat4 transform{};
 		alignas(16) glm::vec3 color;
 	};
 
@@ -65,17 +64,19 @@ namespace Trek
 			pipelineConfigInfo);
 	}
 
-	void SimpleRenderSystem::renderGameObjects(const VkCommandBuffer commandBuffer,
-		std::vector<TrekGameObject>& gameObjects) const
+	void SimpleRenderSystem::renderGameObjects(
+		const VkCommandBuffer commandBuffer,
+		std::vector<TrekGameObject>& gameObjects,
+		const TrekCamera& camera) const
 	{
 		trekPipeline->bind(commandBuffer);
+
+		auto projectionView = camera.getProjection() * camera.getView();
 		for (auto& obj : gameObjects)
 		{
-			obj.transform2d.rotation = glm::mod(obj.transform2d.rotation + 0.01f, glm::two_pi<float>());
 			SimplePushConstantData push{};
-			push.offset = obj.transform2d.translation;
 			push.color = obj.color;
-			push.transform = obj.transform2d.mat2();
+			push.transform = projectionView * obj.transform2d.mat4();
 			vkCmdPushConstants(
 				commandBuffer,
 				pipelineLayout,
