@@ -86,5 +86,8 @@
     <ClInclude Include="headers\keyboard_movement_controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\trek_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
