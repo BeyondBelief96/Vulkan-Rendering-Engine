@@ -15,7 +15,7 @@ namespace Trek
 	struct SimplePushConstantData
 	{
 		glm::mat4 transform{};
-		alignas(16) glm::vec3 color;
+		glm::mat4 normalMatrix{};
 	};
 
 	SimpleRenderSystem::SimpleRenderSystem(TrekCore& device, const VkRenderPass renderPass)
@@ -75,8 +75,9 @@ namespace Trek
 		for (auto& obj : gameObjects)
 		{
 			SimplePushConstantData push{};
-			push.color = obj.color;
+			auto modelMatrix = obj.transform2d.mat4();
 			push.transform = projectionView * obj.transform2d.mat4();
+			push.normalMatrix = obj.transform2d.normalMatrix();
 			vkCmdPushConstants(
 				commandBuffer,
 				pipelineLayout,

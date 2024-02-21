@@ -141,6 +141,7 @@
     <ClCompile Include="src\simple_renderer_system.cpp" />
     <ClCompile Include="src\trek_camera.cpp" />
     <ClCompile Include="src\trek_core.cpp" />
+    <ClCompile Include="src\trek_game_object.cpp" />
     <ClCompile Include="src\trek_model.cpp" />
     <ClCompile Include="src\trek_pipeline.cpp" />
     <ClCompile Include="src\trek_renderer.cpp" />

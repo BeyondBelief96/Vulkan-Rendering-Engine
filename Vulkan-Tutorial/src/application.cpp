@@ -21,7 +21,7 @@ namespace Trek
 	{
 		const SimpleRenderSystem simpleRenderSystem{ trekDevice, trekRenderer.getSwapChainRenderPass() };
 		TrekCamera camera{};
-		camera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
+		camera.setViewTarget(glm::vec3(2.f, -1.f, -1.f), glm::vec3(0.f, 0.f, 2.5f));
 
 		auto viewerObject = TrekGameObject::createGameObject();
 		const KeyboardMovementController cameraController{};
@@ -53,13 +53,18 @@ namespace Trek
 
 	void Application::loadGameObjects()
 	{
-		const std::shared_ptr<TrekModel> model = TrekModel::createModelFromFile(trekDevice, "models/smooth_vase.obj");
-		auto cube = TrekGameObject::createGameObject();
-		cube.model = model;
-		cube.transform2d.translation = { .0f, .0f, 2.5f };
-		cube.transform2d.scale = glm::vec3{ 3.f };
-
-		gameObjects.push_back(std::move(cube));
+		const std::shared_ptr<TrekModel> flatVaseModel = TrekModel::createModelFromFile(trekDevice, "models/flat_vase.obj");
+		const std::shared_ptr<TrekModel> smoothVaseModel = TrekModel::createModelFromFile(trekDevice, "models/smooth_vase.obj");
+		auto flatVase = TrekGameObject::createGameObject();
+		flatVase.model = flatVaseModel;
+		flatVase.transform2d.translation = { .5f, .0f, 2.5f };
+		flatVase.transform2d.scale = glm::vec3{ 3.f };
+		auto smoothVase = TrekGameObject::createGameObject();
+		smoothVase.model = smoothVaseModel;
+		smoothVase.transform2d.translation = { -.5f, .0f, 2.5f };
+		smoothVase.transform2d.scale = glm::vec3{ 3.f };
+		gameObjects.push_back(std::move(flatVase));
+		gameObjects.push_back(std::move(smoothVase));
 	}
 }
 
