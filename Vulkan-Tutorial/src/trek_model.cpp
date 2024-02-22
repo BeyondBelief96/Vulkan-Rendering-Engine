@@ -52,17 +52,7 @@ namespace Trek
 		createIndexBuffer(data.indices);
 	}
 
-	TrekModel::~TrekModel()
-	{
-		vkDestroyBuffer(trekDevice.device(), vertexBuffer, nullptr);
-		vkFreeMemory(trekDevice.device(), vertexBufferMemory, nullptr);
-
-		if(hasIndexBuffer)
-		{
-			vkDestroyBuffer(trekDevice.device(), indexBuffer, nullptr);
-			vkFreeMemory(trekDevice.device(), indexBufferMemory, nullptr);
-		}
-	}
+	TrekModel::~TrekModel(){}
 
 	std::unique_ptr<TrekModel> TrekModel::createModelFromFile(TrekCore& device, const std::string& filePath)
 	{
@@ -73,13 +63,13 @@ namespace Trek
 
 	void TrekModel::bind(const VkCommandBuffer commandBuffer) const
 	{
-		const VkBuffer buffers[] = { vertexBuffer };
+		const VkBuffer buffers[] = { vertexBuffer->getBuffer()};
 		const VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
 
 		if(hasIndexBuffer)
 		{
-			vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindIndexBuffer(commandBuffer, indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 		}
 	}
 
@@ -100,34 +90,28 @@ namespace Trek
 		vertexCount = static_cast<uint32_t>(vertices.size());
 		assert(vertexCount >= 3 && "Vertex count must be atleast 3");
 		const VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
+		uint32_t vertexSize = sizeof(vertices[0]);
 
-		VkBuffer stagingBuffer;
-		VkDeviceMemory stagingBufferMemory;
-
-		trekDevice.createBuffer(
-			bufferSize,
+		TrekBuffer stagingBuffer{
+			trekDevice,
+			vertexSize,
+			vertexCount,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			stagingBuffer,
-			stagingBufferMemory);
+		};
 
+		stagingBuffer.map();
+		stagingBuffer.writeToBuffer((void*)vertices.data());
 
-		void* data;
-		vkMapMemory(trekDevice.device(), stagingBufferMemory, 0, bufferSize, 0, &data);
-		memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-		vkUnmapMemory(trekDevice.device(), stagingBufferMemory);
-
-		trekDevice.createBuffer(
-			bufferSize,
+		vertexBuffer = std::make_unique<TrekBuffer>(
+			trekDevice,
+			vertexSize,
+			vertexCount,
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			vertexBuffer,
-			vertexBufferMemory);
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+			);
 
-		trekDevice.copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-
-		vkDestroyBuffer(trekDevice.device(), stagingBuffer, nullptr);
-		vkFreeMemory(trekDevice.device(), stagingBufferMemory, nullptr);
+		trekDevice.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
 	}
 
 	void TrekModel::createIndexBuffer(const std::vector<uint32_t>& indices)
@@ -137,34 +121,28 @@ namespace Trek
 		if (!hasIndexBuffer) return;
 
 		const VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount;
+		uint32_t indexSize = sizeof(indices[0]);
 
-		VkBuffer stagingBuffer;
-		VkDeviceMemory stagingBufferMemory;
-
-		trekDevice.createBuffer(
-			bufferSize,
+		TrekBuffer stagingBuffer{
+			trekDevice,
+			indexSize,
+			indexCount,
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			stagingBuffer,
-			stagingBufferMemory);
+		};
 
-
-		void* data;
-		vkMapMemory(trekDevice.device(), stagingBufferMemory, 0, bufferSize, 0, &data);
-		memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
-		vkUnmapMemory(trekDevice.device(), stagingBufferMemory);
-
-		trekDevice.createBuffer(
-			bufferSize,
+		stagingBuffer.map();
+		stagingBuffer.writeToBuffer((void*)indices.data());
+		
+		indexBuffer = std::make_unique<TrekBuffer>(
+			trekDevice,
+			indexSize,
+			indexCount,
 			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			indexBuffer,
-			indexBufferMemory);
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+		);
 
-		trekDevice.copyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-		vkDestroyBuffer(trekDevice.device(), stagingBuffer, nullptr);
-		vkFreeMemory(trekDevice.device(), stagingBufferMemory, nullptr);
+		trekDevice.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
 	}
 
 	void TrekModel::Data::loadModel(const std::string& filePath)

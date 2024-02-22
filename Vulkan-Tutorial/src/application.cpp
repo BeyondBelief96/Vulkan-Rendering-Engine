@@ -1,6 +1,7 @@
 #include "application.h"
 #include "simple_render_system.h"
 #include "keyboard_movement_controller.h"
+#include "trek_buffer.h"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -12,20 +13,66 @@
 
 namespace Trek
 {
+	struct GlobalUbo {
+		alignas(16) glm::mat4 projectionView{ 1.f };
+		alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3(1.f, 3.f, -1.f));
+	};
+
 	Application::Application()
 	{
+		globalPool = TrekDescriptorPool::Builder(trekDevice)
+			.setMaxSets(TrekSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, TrekSwapChain::MAX_FRAMES_IN_FLIGHT)
+			.build();
 		loadGameObjects();
 	}
 
 	void Application::run()
 	{
-		const SimpleRenderSystem simpleRenderSystem{ trekDevice, trekRenderer.getSwapChainRenderPass() };
+		// Setting up global uniform buffers.
+		std::vector<std::unique_ptr<TrekBuffer>> uboBuffers(TrekSwapChain::MAX_FRAMES_IN_FLIGHT);
+		for (int i = 0; i < uboBuffers.size(); i++)
+		{
+			uboBuffers[i] = std::make_unique<TrekBuffer>(
+				trekDevice,
+				sizeof(GlobalUbo),
+				1,
+				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+			);
+
+			uboBuffers[i]->map();
+		}
+
+		// Setting up descriptor sets
+
+		auto globalDescriptorSetLayout = TrekDescriptorSetLayout::Builder(trekDevice)
+			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+			.build();
+
+		std::vector<VkDescriptorSet> globalDescriptorSets(TrekSwapChain::MAX_FRAMES_IN_FLIGHT);
+		for (int i = 0; i < globalDescriptorSets.size(); i++)
+		{
+			auto bufferInfo = uboBuffers[i]->descriptorInfo();
+			TrekDescriptorWriter(*globalDescriptorSetLayout, *globalPool)
+				.writeBuffer(0, &bufferInfo)
+				.build(globalDescriptorSets[i]);
+		}
+
+		// Initializing render system and camera system.
+
+		const SimpleRenderSystem simpleRenderSystem{ 
+			trekDevice, 
+			trekRenderer.getSwapChainRenderPass(),
+			globalDescriptorSetLayout->GetDescriptorSetLayout()
+		};
 		TrekCamera camera{};
 		camera.setViewTarget(glm::vec3(2.f, -1.f, -1.f), glm::vec3(0.f, 0.f, 2.5f));
 
 		auto viewerObject = TrekGameObject::createGameObject();
 		const KeyboardMovementController cameraController{};
 
+		// Render loop
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		while(!trekWindow.shouldClose())
 		{
@@ -41,8 +88,24 @@ namespace Trek
 			camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 10.f);
 			if(const auto commandBuffer = trekRenderer.beginFrame())
 			{
+				int frameIndex = trekRenderer.getFrameIndex();
+				FrameInfo frameInfo{
+					frameIndex,
+					frameTime,
+					commandBuffer,
+					camera,
+					globalDescriptorSets[frameIndex]
+				};
+
+				// update
+				GlobalUbo ubo{};
+				ubo.projectionView = camera.getProjection() * camera.getView();
+				uboBuffers[frameIndex]->writeToBuffer(&ubo);
+				uboBuffers[frameIndex]->flush();
+
+				// render
 				trekRenderer.beginSwapChainRenderPass(commandBuffer);
-				simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
+				simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
 				trekRenderer.endSwapChainRenderPass(commandBuffer);
 				trekRenderer.endFrame();
 			}

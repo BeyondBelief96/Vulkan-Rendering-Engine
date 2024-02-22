@@ -139,8 +139,10 @@
     <ClCompile Include="src\keyboard_movement_controller.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\simple_renderer_system.cpp" />
+    <ClCompile Include="src\trek_buffer.cpp" />
     <ClCompile Include="src\trek_camera.cpp" />
     <ClCompile Include="src\trek_core.cpp" />
+    <ClCompile Include="src\trek_descriptor_set.cpp" />
     <ClCompile Include="src\trek_game_object.cpp" />
     <ClCompile Include="src\trek_model.cpp" />
     <ClCompile Include="src\trek_pipeline.cpp" />
@@ -155,6 +157,8 @@
     <ClInclude Include="headers\trek_buffer.h" />
     <ClInclude Include="headers\trek_camera.h" />
     <ClInclude Include="headers\trek_core.h" />
+    <ClInclude Include="headers\trek_descriptor_set.h" />
+    <ClInclude Include="headers\trek_frame_info.h" />
     <ClInclude Include="headers\trek_game_object.h" />
     <ClInclude Include="headers\trek_model.h" />
     <ClInclude Include="headers\trek_pipeline.h" />

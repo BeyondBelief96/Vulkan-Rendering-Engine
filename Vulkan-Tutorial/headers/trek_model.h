@@ -2,6 +2,7 @@
 #define TREK_MODEL_H
 #include "trek_core.h"
 #include "trek_swapchain.h"
+#include "trek_buffer.h"
 //libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORECE_DEPTH_ZERO_TO_ONE
@@ -66,14 +67,12 @@ namespace Trek
         void createIndexBuffer(const std::vector<uint32_t>& indices);
 
         TrekCore& trekDevice;
-
-        VkBuffer vertexBuffer;
-        VkDeviceMemory vertexBufferMemory;
+        
+        std::unique_ptr<TrekBuffer> vertexBuffer;
         uint32_t vertexCount;
 
         bool hasIndexBuffer = false;
-        VkBuffer indexBuffer;
-        VkDeviceMemory indexBufferMemory;
+        std::unique_ptr<TrekBuffer> indexBuffer;
         uint32_t indexCount;
         
     };

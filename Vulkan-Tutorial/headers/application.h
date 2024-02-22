@@ -5,6 +5,7 @@
 #include "trek_renderer.h"
 #include "trek_game_object.h"
 #include "trek_camera.h"
+#include "trek_descriptor_set.h"
 
 // std
 #include <memory>
@@ -30,6 +31,8 @@ namespace Trek
 		TrekWindow trekWindow{WIDTH, HEIGHT, "Vulkan Tutorial!"};
 		TrekCore trekDevice{ trekWindow };
 		TrekRenderer trekRenderer{ trekWindow, trekDevice };
+
+		std::unique_ptr<TrekDescriptorPool> globalPool{};
 		std::vector<TrekGameObject> gameObjects;
 	};
 }
