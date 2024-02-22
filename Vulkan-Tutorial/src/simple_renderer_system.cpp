@@ -21,8 +21,12 @@ namespace Trek
 	SimpleRenderSystem::SimpleRenderSystem(
 		TrekCore& device,
 		const VkRenderPass renderPass,
-		VkDescriptorSetLayout globalSetLayout)
-		: trekDevice{device}
+		VkDescriptorSetLayout globalSetLayout,
+		std::string vertexShader,
+		std::string fragmentShader)
+		: trekDevice{device},
+		vertexShaderPath(vertexShader),
+		fragmentShaderPath(fragmentShader)
 	{
 		createPipelineLayout(globalSetLayout);
 		createPipeline(renderPass);
@@ -64,8 +68,8 @@ namespace Trek
 		pipelineConfigInfo.pipelineLayout = pipelineLayout;
 		trekPipeline = std::make_unique<TrekPipeline>(
 			trekDevice,
-			"shaders/vert.spv",
-			"shaders/frag.spv",
+			vertexShaderPath,
+			fragmentShaderPath,
 			pipelineConfigInfo);
 	}
 

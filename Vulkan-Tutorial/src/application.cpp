@@ -60,11 +60,12 @@ namespace Trek
 		}
 
 		// Initializing render system and camera system.
-
 		const SimpleRenderSystem simpleRenderSystem{ 
 			trekDevice, 
 			trekRenderer.getSwapChainRenderPass(),
-			globalDescriptorSetLayout->GetDescriptorSetLayout()
+			globalDescriptorSetLayout->GetDescriptorSetLayout(),
+			"shaders/directional_lighting_ubo_vertex.spv",
+			"shaders/directional_lighting_ubo_fragment.spv"
 		};
 		TrekCamera camera{};
 		camera.setViewTarget(glm::vec3(2.f, -1.f, -1.f), glm::vec3(0.f, 0.f, 2.5f));

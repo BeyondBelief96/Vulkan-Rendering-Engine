@@ -18,7 +18,9 @@ namespace Trek
 		SimpleRenderSystem(
 			TrekCore& device,
 			VkRenderPass renderPass,
-			VkDescriptorSetLayout globalSetLayout);
+			VkDescriptorSetLayout globalSetLayout,
+			std::string vertexShader,
+			std::string fragmentShader);
 		~SimpleRenderSystem();
 		SimpleRenderSystem(const SimpleRenderSystem&) = delete;
 		SimpleRenderSystem& operator=(SimpleRenderSystem&) = delete;
@@ -35,6 +37,9 @@ namespace Trek
 		TrekCore& trekDevice;
 		std::unique_ptr<TrekPipeline> trekPipeline;
 		VkPipelineLayout pipelineLayout;
+
+		const std::string vertexShaderPath;
+		const std::string fragmentShaderPath;
 	};
 }
 
