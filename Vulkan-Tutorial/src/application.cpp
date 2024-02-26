@@ -13,11 +13,6 @@
 
 namespace Trek
 {
-	struct GlobalUbo {
-		alignas(16) glm::mat4 projectionView{ 1.f };
-		alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3(1.f, 3.f, -1.f));
-	};
-
 	Application::Application()
 	{
 		globalPool = TrekDescriptorPool::Builder(trekDevice)
@@ -67,10 +62,12 @@ namespace Trek
 			"shaders/directional_lighting_ubo_vertex.spv",
 			"shaders/directional_lighting_ubo_fragment.spv"
 		};
+
 		TrekCamera camera{};
 		camera.setViewTarget(glm::vec3(2.f, -1.f, -1.f), glm::vec3(0.f, 0.f, 2.5f));
 
 		auto viewerObject = TrekGameObject::createGameObject();
+		viewerObject.transform2d.translation.z = -2.5f;
 		const KeyboardMovementController cameraController{};
 
 		// Render loop
@@ -119,16 +116,26 @@ namespace Trek
 	{
 		const std::shared_ptr<TrekModel> flatVaseModel = TrekModel::createModelFromFile(trekDevice, "models/flat_vase.obj");
 		const std::shared_ptr<TrekModel> smoothVaseModel = TrekModel::createModelFromFile(trekDevice, "models/smooth_vase.obj");
+		const std::shared_ptr<TrekModel> floorModel = TrekModel::createModelFromFile(trekDevice, "models/quad.obj");
+
 		auto flatVase = TrekGameObject::createGameObject();
 		flatVase.model = flatVaseModel;
-		flatVase.transform2d.translation = { .5f, .0f, 2.5f };
+		flatVase.transform2d.translation = { -.5f, .5f, 0.f };
 		flatVase.transform2d.scale = glm::vec3{ 3.f };
+
 		auto smoothVase = TrekGameObject::createGameObject();
 		smoothVase.model = smoothVaseModel;
-		smoothVase.transform2d.translation = { -.5f, .0f, 2.5f };
+		smoothVase.transform2d.translation = { .5f, .5f, 0.f };
 		smoothVase.transform2d.scale = glm::vec3{ 3.f };
+
+		auto floor = TrekGameObject::createGameObject();
+		floor.model = floorModel;
+		floor.transform2d.translation = { 0.f, .5f, 0.f };
+		floor.transform2d.scale = { 3.f, 1.f, 3.f };
+
 		gameObjects.push_back(std::move(flatVase));
 		gameObjects.push_back(std::move(smoothVase));
+		gameObjects.push_back(std::move(floor));
 	}
 }
 

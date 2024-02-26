@@ -13,6 +13,13 @@
 
 namespace Trek
 {
+	struct GlobalUbo {
+		glm::mat4 projectionView{ 1.f };
+		glm::vec4 ambientLightColor{ 1.f, 1.f, 1.f, .02f }; // w is intensity.
+		glm::vec3 lightPosition{ -1.f };
+		alignas(16) glm::vec4 lightColor{ 1.f };
+	};
+
 	class Application
 	{
 	public:
