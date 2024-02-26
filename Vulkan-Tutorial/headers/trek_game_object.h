@@ -8,6 +8,7 @@
 
 // std
 #include <memory>
+#include <unordered_map>
 
 
 namespace Trek
@@ -25,6 +26,7 @@ namespace Trek
 
 	public:
 		using id_t = unsigned int;
+		using Map = std::unordered_map<id_t, TrekGameObject>;
 
 		TrekGameObject(const TrekGameObject&) = delete;
 		TrekGameObject& operator=(TrekGameObject&) = delete;

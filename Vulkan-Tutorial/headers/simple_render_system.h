@@ -28,8 +28,7 @@ namespace Trek
 		SimpleRenderSystem& operator=(SimpleRenderSystem&&) = delete;
 
 		void renderGameObjects(
-			FrameInfo& frameInfo,
-			std::vector<TrekGameObject>& gameObjects) const;
+			FrameInfo& frameInfo) const;
 	private:
 		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 		void createPipeline(VkRenderPass renderPass);

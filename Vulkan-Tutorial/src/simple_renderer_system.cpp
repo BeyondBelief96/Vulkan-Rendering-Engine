@@ -74,8 +74,7 @@ namespace Trek
 	}
 
 	void SimpleRenderSystem::renderGameObjects(
-		FrameInfo& frameInfo,
-		std::vector<TrekGameObject>& gameObjects) const
+		FrameInfo& frameInfo) const
 	{
 		trekPipeline->bind(frameInfo.commandBuffer);
 
@@ -90,8 +89,9 @@ namespace Trek
 			nullptr
 		);
 
-		for (auto& obj : gameObjects)
+		for (auto& kv : frameInfo.gameObjects)
 		{
+			auto& obj = kv.second;
 			SimplePushConstantData push{};
 			push.modelMatrix = obj.transform2d.mat4();
 			push.normalMatrix = obj.transform2d.normalMatrix();

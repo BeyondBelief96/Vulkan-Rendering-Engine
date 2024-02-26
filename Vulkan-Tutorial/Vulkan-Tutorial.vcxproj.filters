@@ -57,6 +57,12 @@
     <ClCompile Include="src\trek_descriptor_set.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\scenes\diffuse_lighting_scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\application.h">
@@ -102,6 +108,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\trek_descriptor_set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -138,6 +138,8 @@
     <ClCompile Include="src\application.cpp" />
     <ClCompile Include="src\keyboard_movement_controller.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\scenes\diffuse_lighting_scene.cpp" />
+    <ClCompile Include="src\scenes\scene.cpp" />
     <ClCompile Include="src\simple_renderer_system.cpp" />
     <ClCompile Include="src\trek_buffer.cpp" />
     <ClCompile Include="src\trek_camera.cpp" />
@@ -153,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="headers\application.h" />
     <ClInclude Include="headers\keyboard_movement_controller.h" />
+    <ClInclude Include="headers\scene.h" />
     <ClInclude Include="headers\simple_render_system.h" />
     <ClInclude Include="headers\trek_buffer.h" />
     <ClInclude Include="headers\trek_camera.h" />

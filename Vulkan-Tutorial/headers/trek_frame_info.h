@@ -2,6 +2,7 @@
 #define TREK_FRAME_INFO
 
 #include "trek_camera.h"
+#include "trek_game_object.h"
 
 //lib
 #include <vulkan/vulkan.h>
@@ -14,6 +15,7 @@ namespace Trek
 		VkCommandBuffer commandBuffer;
 		TrekCamera& camera;
 		VkDescriptorSet globalDescriptorSet;
+		TrekGameObject::Map& gameObjects;
 	};
 }
 
