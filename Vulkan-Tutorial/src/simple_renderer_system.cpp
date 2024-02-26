@@ -21,14 +21,14 @@ namespace Trek
 	SimpleRenderSystem::SimpleRenderSystem(
 		TrekCore& device,
 		const VkRenderPass renderPass,
-		VkDescriptorSetLayout globalSetLayout,
+		VkDescriptorSetLayout globalDescriptorSetLayout,
 		std::string vertexShader,
-		std::string fragmentShader)
-		: trekDevice{device},
+		std::string fragmentShader) : 
+		trekDevice{device},
 		vertexShaderPath(vertexShader),
 		fragmentShaderPath(fragmentShader)
 	{
-		createPipelineLayout(globalSetLayout);
+		createPipelineLayout(globalDescriptorSetLayout);
 		createPipeline(renderPass);
 	}
 
@@ -37,14 +37,14 @@ namespace Trek
 		vkDestroyPipelineLayout(trekDevice.device(), pipelineLayout, nullptr);
 	}
 
-	void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
+	void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalDescriptorSetLayout)
 	{
 		VkPushConstantRange pushConstantRange{};
 		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 		pushConstantRange.offset = 0;
 		pushConstantRange.size = sizeof(SimplePushConstantData);
 
-		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{ globalSetLayout };
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{ globalDescriptorSetLayout };
 
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -93,7 +93,6 @@ namespace Trek
 		for (auto& obj : gameObjects)
 		{
 			SimplePushConstantData push{};
-			auto modelMatrix = obj.transform2d.mat4();
 			push.modelMatrix = obj.transform2d.mat4();
 			push.normalMatrix = obj.transform2d.normalMatrix();
 			vkCmdPushConstants(
